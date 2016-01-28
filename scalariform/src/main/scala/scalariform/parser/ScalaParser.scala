@@ -1239,7 +1239,8 @@ class ScalaParser(tokens: Array[Token]) {
     if (LBRACKET) {
       val bracketsContents =
         inBrackets(commaSeparated((annotations(skipNewLines = true), typeParam())))
-      Some(TypeParamClause(typeElementFlatten3(newLineOpt, bracketsContents)))
+      ???
+      //Some(TypeParamClause(typeElementFlatten3(newLineOpt, bracketsContents)))
     } else
       None
   }

@@ -153,7 +153,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           case SingleLineComment(_) if nextCommentOption.isDefined || includeBufferBeforeNextToken ⇒ builder.currentIndent
           case _ ⇒ ""
         }
-        builder.write(comment.token)
+        // builder.write(comment.token)
         builder.append(extraIndent)
       }
       val needGapBetweenThisAndFollowing = cond(comments.lastOption) {

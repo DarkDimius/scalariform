@@ -18,14 +18,14 @@ object PreferencesImporterExporter {
     def setPreference[T](preferenceDescriptor: PreferenceDescriptor[T], valueString: String) =
       preferenceDescriptor.preferenceType.parseValue(valueString) match {
         case Left(error)  ⇒
-        case Right(value) ⇒ preferences = preferences.setPreference(preferenceDescriptor, value)
+        case Right(value) ⇒ //preferences = preferences.setPreference(preferenceDescriptor, value)
       }
 
-    for {
+    /*for {
       key @ (dummy: String) ← properties.propertyNames
       descriptor ← AllPreferences.preferencesByKey.get(key)
       valueString = properties.getProperty(key)
-    } setPreference(descriptor, valueString)
+    } setPreference(descriptor, valueString)  */
     preferences
 
   }
