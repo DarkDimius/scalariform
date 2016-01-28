@@ -11,7 +11,7 @@ import scala.PartialFunction._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒
 
-  def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents: List[ExprElement])
+  def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = formatExprElements(expr.contents)._1
 
   private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = formatExprElements(exprElements)._1
 
@@ -33,7 +33,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case postfixExpr: PostfixExpr                 ⇒ format(postfixExpr)
     case annotation: Annotation                   ⇒ format(annotation)
     case typeExprElement: TypeExprElement         ⇒ format(typeExprElement.contents)
-    case expr: Expr                               ⇒ format(expr.contents)
+    case expr: Expr                               ⇒ formatExprElements(expr.contents)._1
     case argument: Argument                       ⇒ format(argument.expr)
     case xmlExpr: XmlExpr                         ⇒ format(xmlExpr)
     case parenExpr: ParenExpr                     ⇒ format(parenExpr)._1
@@ -71,7 +71,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val (leftFormatResult, updatedFormatterState) = formatExprElements(left)
     currentFormatterState = updatedFormatterState
     formatResult ++= leftFormatResult
-    formatResult ++= format(right)(currentFormatterState)
+    formatResult ++= formatExprElements(right)(currentFormatterState)._1
     formatResult
   }
 
@@ -267,7 +267,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(postfixExpr: PostfixExpr)(implicit formatterState: FormatterState): FormatResult = {
     val PostfixExpr(first, postfixId) = postfixExpr
     var formatResult: FormatResult = NoFormatResult
-    formatResult ++= format(first)
+    formatResult ++= formatExprElements(first)(formatterState)._1
     formatResult = formatResult.before(postfixId, CompactPreservingGap)
     formatResult
   }
@@ -275,7 +275,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def format(anonymousFunction: AnonymousFunction)(implicit formatterState: FormatterState): FormatResult = { // <-- Also formatted specially in BlockExpr
     val AnonymousFunction(parameters, _, body) = anonymousFunction
     var formatResult: FormatResult = NoFormatResult
-    formatResult ++= format(parameters)
+    formatResult ++= formatExprElements(parameters)(formatterState)._1
     val bodyFirstTokenOpt = body.tokens.headOption
     val newlineBeforeBody = bodyFirstTokenOpt exists { hiddenPredecessors(_).containsNewline }
     if (newlineBeforeBody) {
@@ -287,7 +287,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = argumentExprs match {
-    case BlockArgumentExprs(contents) ⇒ (format(contents), formatterState)
+    case BlockArgumentExprs(contents) ⇒ (formatExprElements(contents)(formatterState)._1, formatterState)
     case args @ ParenArgumentExprs(lparen, contents, rparen) ⇒
       var currentFormatterState = formatterState
       var formatResult: FormatResult = NoFormatResult
@@ -770,7 +770,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   else
                     (CompactEnsuringGap, indentedState)
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
-                formatResult ++= format(params)
+                formatResult ++= formatExprElements(params)(formatterState)._1
                 for (firstToken ← subStatSeq.firstTokenOption) {
                   val instruction =
                     if (hasNestedAnonymousFunction(subStatSeq))
