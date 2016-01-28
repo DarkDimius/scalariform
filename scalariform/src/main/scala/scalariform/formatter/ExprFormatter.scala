@@ -11,7 +11,7 @@ import scala.PartialFunction._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒
 
-  def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents)
+  def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents: List[ExprElement])
 
   private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = formatExprElements(exprElements)._1
 
