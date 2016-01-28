@@ -181,10 +181,10 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
 
   private def isSelectableAst(nodeStack: List[AstNode]) =
     nodeStack match {
-      case List(_: BlockExpr, _: MatchExpr, _*)   ⇒ false
-      case List(_: BlockExpr, _: ProcFunBody, _*) ⇒ false
-      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass.asInstanceOf[Class[_ <: AstNode]])
-      case Nil                                    ⇒ false
+      case (_: BlockExpr) :: (_: MatchExpr) :: _   ⇒ false
+      case (_: BlockExpr) :: (_: ProcFunBody) :: _ ⇒ false
+      case node :: tail                            ⇒ !(nonSelectableAstNodes contains node.getClass.asInstanceOf[Class[_ <: AstNode]])
+      case Nil                                     ⇒ false
     }
 
 }
