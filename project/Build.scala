@@ -25,30 +25,17 @@ object ScalariformBuild extends Build {
     organization := "org.scalariform",
     profileName := "org.scalariform",
     version := "0.2.0-SNAPSHOT",
-    scalaVersion := "2.11.7",
+    scalaVersion := "0.1-SNAPSHOT",
+    scalaBinaryVersion := "2.11",
+    autoScalaLibrary := false,
+    scalaCompilerBridgeSource := ("ch.epfl.lamp" % "dotty-bridge" % "0.1-SNAPSHOT" % "component").sources(),
     crossScalaVersions := Seq(
       "2.11.7",
       "2.10.6",
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
-    scalacOptions ++= (scalaBinaryVersion.value match {
-      case "2.11" => Seq(
-        "-deprecation:false",
-        "-encoding", "UTF-8",
-        "-feature",
-        "-language:_",
-        "-unchecked",
-        "-Xlint",
-        "-Xfuture",
-        "-Xfatal-warnings",
-        "-Yno-adapted-args",
-        "-Ywarn-dead-code",
-        "-Ywarn-unused-import",
-        "-Ywarn-unused"
-      )
-      case _ => Seq()
-    })
+    scalacOptions ++= Seq("-language:Scala2")
   )
 
   lazy val subprojectSettings = commonSettings ++ Seq(
@@ -64,17 +51,18 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case r"2.11.\d+[-\w]*" | r"2.10.\d+[-\w]*" => "org.scalatest" %%  "scalatest" % "2.2.4" % "test"
-    case "2.9.3" => "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case _       => "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    case _ => "org.scalatest" %%  "scalatest" % "2.2.4" % "test"
+    //case "2.9.3" => "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    //case _       => "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
-    case r"2.11.\d+[-\w]*" => List(
+    case _ => List(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.1",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1",
+      "org.scala-lang" % "scala-library" % "2.11.5"
     )
-    case _ => Nil
+//   case _ => Nil
   }
 
   def publishSettings(projectName: String) = Seq(
